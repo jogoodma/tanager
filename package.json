@@ -1,0 +1,17 @@
+{
+  "name": "inspyred-dashboard",
+  "version": "0.1.0",
+  "description": "A dashboard visualization tool for Inspyred",
+  "author": "Josh Goodman <jogoodma@iu.edu>",
+  "license": "MIT",
+  "scripts": {
+    "build:css": "NODE_ENV=production yarn run tailwindcss-cli build ./css/tailwind.css -o ./assets/styles.css",
+    "dev": "watch --wait 2 -p '/assets|venv|node_modules/' 'yarn run build:css' ./"
+  },
+  "dependencies": {
+    "tailwindcss-cli": "^0.1.2"
+  },
+  "devDependencies": {
+    "watch": "^1.0.2"
+  }
+}
