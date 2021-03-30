@@ -3,16 +3,14 @@
 # visit http://127.0.0.1:8050/ in your web browser.
 
 import dash
-import dash_core_components as dcc
 import dash_html_components as html
-from dash.dependencies import Input, Output
-import plotly.express as px
 
-import pandas as pd
+import tanager.components as tc
+import tanager.plots as tp
 
-df = pd.read_csv('https://raw.githubusercontent.com/plotly/datasets/master/gapminderDataFiveYear.csv')
-
-external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
+external_stylesheets = [
+    "https://use.fontawesome.com/releases/v5.15.3/css/all.css"
+]
 
 app = dash.Dash(__name__, meta_tags=[
     {'name': 'viewport',
@@ -21,35 +19,25 @@ app = dash.Dash(__name__, meta_tags=[
 ], external_stylesheets=external_stylesheets)
 
 app.layout = html.Div(children=[
-    html.Div(children='Navbar', className='flex flex-col w-40 md:w-56 bg-indigo-200 rounded-r-3xl overflow-hidden'),
+    tc.navbar(children=[
+        tc.navbar_item('Experiment 1', href='/overview/experiment1'),
+        tc.navbar_item('Experiment 2', href='/overview/experiment2')
+    ]),
     html.Div(children=[
-        dcc.Graph(id='graph-with-slider'),
-        dcc.Slider(
-            id='year-slider',
-            min=df['year'].min(),
-            max=df['year'].max(),
-            value=df['year'].min(),
-            marks={str(year): str(year) for year in df['year'].unique()},
-            step=None
-        )
+        html.Main(children=[
+            tc.graph_panel(children=[
+               tp.generation_distribution()
+            ]),
+            tc.graph_panel(children=[
+                tp.fitness_vs_generation()
+            ]),
+            tc.graph_panel('3'),
+            tc.graph_panel('4'),
+            tc.graph_panel('5')
+        ], className='grid grid-cols-2 gap-6 mt-20 mr-20')
     ]
-        , className='p-5 w-full')
-], className='min-h-screen flex flex-row bg-gray-100')
-
-@app.callback(
-    Output('graph-with-slider', 'figure'),
-    Input('year-slider', 'value'))
-def update_figure(selected_year):
-    filtered_df = df[df.year == selected_year]
-
-    fig = px.scatter(filtered_df, x="gdpPercap", y="lifeExp",
-                     size="pop", color="continent", hover_name="country",
-                     log_x=True, size_max=55)
-
-    fig.update_layout(transition_duration=500)
-
-    return fig
-
+        , className='w-full bg-gray-100 pl-20')
+], className='min-h-screen flex flex-row')
 
 if __name__ == '__main__':
     app.run_server(debug=True)
