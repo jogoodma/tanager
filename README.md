@@ -89,6 +89,10 @@ python source code and rebuilds the CSS when necessary.
 yarn run dev
 ```
 
+### Adding Plots
+
+*TODO* Add docs on adding new plots.
+
 ## See Also
 
 * [Inspyred](https://pythonhosted.org/inspyred/)

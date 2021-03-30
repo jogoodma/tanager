@@ -23,10 +23,12 @@ def navbar_item(*args, **kwargs):
     children.append(*args)
     children.insert(0, html.I(className='fas fa-chart-bar mx-3'))
 
-    return html.A(className='flex items-center mt-4 py-2 px-6 text-gray-500 hover:bg-gray-700 hover:bg-opacity-25 hover:text-gray-100',
-                  children=children,
-                  **kwargs
-                  )
+    return html.A(
+        className='flex items-center mt-4 py-2 px-6 text-gray-500 hover:bg-gray-700 hover:bg-opacity-25 hover:text-gray-100',
+        children=children,
+        **kwargs
+        )
+
 
 def graph_panel(*args, **kwargs):
     classname = kwargs.pop('className', '') + ' flex items-center px-5 py-6 shadow-lg rounded-xl bg-white'
