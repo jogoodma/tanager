@@ -6,7 +6,7 @@ import statistics as stats
 # Create the parser
 parser = argparse.ArgumentParser(
     prog='sample_data_generator',
-    usage='%(prog)s [options] path',
+    usage='%(prog)s [options]',
     description='Tanager sample data generator.')
 
 parser.add_argument('-generations', type=int, default=10, help="Number of generations.")
