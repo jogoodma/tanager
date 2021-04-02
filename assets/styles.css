@@ -546,8 +546,17 @@ video {
   --tw-bg-opacity: 0.25;
 }
 
+.border-black {
+  --tw-border-opacity: 1;
+  border-color: rgba(0, 0, 0, var(--tw-border-opacity));
+}
+
 .rounded-xl {
   border-radius: 0.75rem;
+}
+
+.border {
+  border-width: 1px;
 }
 
 .flex {
@@ -582,6 +591,10 @@ video {
   font-weight: 600;
 }
 
+.font-bold {
+  font-weight: 700;
+}
+
 .h-full {
   height: 100%;
 }
@@ -589,6 +602,11 @@ video {
 .text-2xl {
   font-size: 1.5rem;
   line-height: 2rem;
+}
+
+.text-6xl {
+  font-size: 3.75rem;
+  line-height: 1;
 }
 
 .mx-2 {
@@ -599,6 +617,10 @@ video {
 .mx-3 {
   margin-left: 0.75rem;
   margin-right: 0.75rem;
+}
+
+.mb-0 {
+  margin-bottom: 0px;
 }
 
 .mt-4 {
@@ -613,12 +635,20 @@ video {
   margin-top: 2rem;
 }
 
+.ml-10 {
+  margin-left: 2.5rem;
+}
+
 .mt-20 {
   margin-top: 5rem;
 }
 
 .mr-20 {
   margin-right: 5rem;
+}
+
+.mt-40 {
+  margin-top: 10rem;
 }
 
 .min-h-screen {
@@ -676,6 +706,11 @@ video {
   color: rgba(255, 255, 255, var(--tw-text-opacity));
 }
 
+.text-gray-400 {
+  --tw-text-opacity: 1;
+  color: rgba(156, 163, 175, var(--tw-text-opacity));
+}
+
 .text-gray-500 {
   --tw-text-opacity: 1;
   color: rgba(107, 114, 128, var(--tw-text-opacity));
@@ -698,8 +733,8 @@ video {
   gap: 1.5rem;
 }
 
-.grid-cols-1 {
-  grid-template-columns: repeat(1, minmax(0, 1fr));
+.grid-cols-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 @-webkit-keyframes spin {
@@ -781,13 +816,6 @@ video {
 }
 
 @media (min-width: 1280px) {
-  .xl\:grid-cols-2 {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .xl\:col-span-2 {
-    grid-column: span 2 / span 2;
-  }
 }
 
 @media (min-width: 1536px) {

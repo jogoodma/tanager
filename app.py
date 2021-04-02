@@ -1,18 +1,95 @@
 #!/usr/bin/env python3
 # Run this app with `python app.py` and
 # visit http://127.0.0.1:8050/ in your web browser.
-import dash
-import dash_html_components as html
+
 import argparse
 import os
+
+import dash
+import dash_core_components as dcc
+import dash_html_components as html
 
 import tanager.components as tc
 import tanager.plots as tp
 
-external_stylesheets = [
-    "https://use.fontawesome.com/releases/v5.15.3/css/all.css"
-]
 
+def get_projects(path: str):
+    projects = []
+    if os.path.exists(path):
+        directory_contents = os.listdir(path)
+        for item in directory_contents:
+            item_path = f'{path}/{item}'
+            if os.path.isdir(item_path):
+                projects.append(item)
+    return projects
+
+
+def prepare_dash_server(projects):
+    external_stylesheets = [
+        "https://use.fontawesome.com/releases/v5.15.3/css/all.css"
+    ]
+
+    app = dash.Dash(__name__, meta_tags=[
+        {'name': 'viewport',
+         'content': 'width=device-width, initial-scale=1.0'
+         }
+    ], external_stylesheets=external_stylesheets)
+
+    app.layout = html.Div(children=[
+        dcc.Location(id='url-nav', refresh=False),
+        tc.navbar(children=tanager_nav_children),
+        dcc.Location(id='url', refresh=False),
+        # content will be rendered in this element
+        html.Div(id='page-content', className='w-full bg-gray-100 pl-20')
+    ], className='min-h-screen flex flex-row')
+
+    return app
+
+
+def load_tanager_layouts():
+    tanager_layouts['default'] = html.Div(children=
+    [
+        html.H1("Welcome to Tanager!", className="text-6xl font-bold alert-heading"),
+        html.H2(
+            "Tanager allows you to visualize Inspyred. ",
+            className='text-2xl text-gray-400 ml-10'
+        ),
+        html.Hr(className='border border-black'),
+        html.P(
+            "Please select the project from the left navigation to get started",
+            className="mb-0",
+        )
+    ], className='mt-40'
+    )
+
+    tanager_layouts['Rastrigin'] = html.Div(children=[
+        html.Main(children=[
+            tc.graph_panel(children=[
+                tp.generation_distribution('Rastrigin')
+            ]),
+            tc.graph_panel(children=[
+                tp.fitness_vs_generation('Rastrigin')
+            ])
+        ], className='grid grid-cols-2 gap-6 mt-20 mr-20')
+    ], className='w-full bg-gray-100 pl-20')
+
+    tanager_layouts['Polygon'] = html.Div(children=[
+        html.Main(children=[
+            tc.graph_panel(children=[
+                tp.generation_distribution('Polygon')
+            ]),
+            tc.graph_panel(children=[
+                tp.fitness_vs_generation('Polygon')
+            ]),
+            tc.graph_panel('3'),
+            tc.graph_panel('4')
+        ], className='grid grid-cols-2 gap-6 mt-20 mr-20')
+    ], className='w-full bg-gray-100 pl-20')
+
+    return
+
+
+# Global Area
 # Create the parser
 parser = argparse.ArgumentParser(
     prog='app',
@@ -23,50 +100,32 @@ parser.add_argument('-debug', action="store_true", default=False, help="Run in d
 parser.add_argument('dir', type=str, help="Directory containing observer files.")
 args = parser.parse_args()
 
+projects = get_projects(args.dir)
+tanager_nav_children = []
+tanager_layouts = {}
 
-def get_files(directory:str):
-    if os.path.isdir(directory):
-        for root, dirs, files in os.walk(os.path.realpath(directory)):
-            for name in files:
-                print(os.path.join(root, name))
-            for name in dirs:
-                print(os.path.join(root, name))
-    return None
-
-
-def setup_app(args):
-    get_files(args.dir)
-    app = dash.Dash(__name__, meta_tags=[
-        {'name': 'viewport',
-         'content': 'width=device-width, initial-scale=1.0'
-         }
-    ], external_stylesheets=external_stylesheets)
-
-    app.layout = html.Div(children=[
-        tc.navbar(children=[
-            tc.navbar_item('Experiment 1', href='/overview/experiment1'),
-            tc.navbar_item('Experiment 2', href='/overview/experiment2')
-        ]),
-        html.Div(children=[
-            html.Main(children=[
-                tc.graph_panel(children=[
-                    tp.fitness_vs_generation()
-                ]),
-                tc.graph_panel(children=[
-                    tp.generation_distribution()
-                ]),
-                # Add new plots here as children of graph_panel component
-                # Use xl:col-span-2 to force a single column row.
-                tc.graph_panel('3', className='xl:col-span-2'),
-                tc.graph_panel('4'),
-                tc.graph_panel('5')
-            ], className='grid grid-cols-1 xl:grid-cols-2 gap-6 mt-20 mr-20')
-        ]
-            , className='w-full bg-gray-100 pl-20')
-    ], className='min-h-screen flex flex-row')
-    return app
-
+for project in projects:
+    nav_bar_item = tc.navbar_item(project, href=f'/{project}')
+    tanager_nav_children.append(nav_bar_item)
 
 if __name__ == '__main__':
-    dash_app = setup_app(args)
-    #dash_app.run_server(debug=args.debug)
+    load_tanager_layouts()
+    app = prepare_dash_server(projects)
+
+
+    @app.callback(dash.dependencies.Output('page-content', 'children'),
+                  [dash.dependencies.Input('url', 'pathname')])
+    def display_page(pathname="/"):
+        ctx = dash.callback_context
+        triggered_by = ctx.triggered[0].get("prop_id")
+
+        layout_name = pathname.strip('/')
+        if layout_name is not None and layout_name in tanager_layouts:
+            page_layout = tanager_layouts[layout_name]
+        else:
+            page_layout = tanager_layouts['default']
+
+        return page_layout
+
+
+    app.run_server(debug=args.debug)
