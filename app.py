@@ -36,9 +36,8 @@ def prepare_dash_server(projects):
     ], external_stylesheets=external_stylesheets)
 
     app.layout = html.Div(children=[
-        dcc.Location(id='url-nav', refresh=False),
-        tc.navbar(children=tanager_nav_children),
         dcc.Location(id='url', refresh=False),
+        tc.navbar(children=tanager_nav_children),
         # content will be rendered in this element
         html.Div(id='page-content', className='w-full bg-gray-100 pl-20')
     ], className='min-h-screen flex flex-row')
@@ -116,8 +115,8 @@ if __name__ == '__main__':
     @app.callback(dash.dependencies.Output('page-content', 'children'),
                   [dash.dependencies.Input('url', 'pathname')])
     def display_page(pathname="/"):
-        ctx = dash.callback_context
-        triggered_by = ctx.triggered[0].get("prop_id")
+        # ctx = dash.callback_context
+        # triggeredred_by = ctx.triggered[0].get("prop_id")
 
         layout_name = pathname.strip('/')
         if layout_name is not None and layout_name in tanager_layouts:
