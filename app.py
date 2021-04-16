@@ -8,11 +8,10 @@ import os
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
+from dash.dependencies import Input, Output
 
 import tanager.components as tc
 import tanager.plots as tp
-
-from dash.dependencies import Input, Output
 
 
 def get_projects(path: str):
@@ -31,7 +30,7 @@ def prepare_dash_server(projects):
         "https://use.fontawesome.com/releases/v5.15.3/css/all.css"
     ]
 
-    app = dash.Dash(__name__, meta_tags=[
+    app = dash.Dash('Tanager', meta_tags=[
         {'name': 'viewport',
          'content': 'width=device-width, initial-scale=1.0'
          }
@@ -96,6 +95,7 @@ if __name__ == '__main__':
     projects = get_projects(args.dir)
     app = prepare_dash_server(projects)
 
+
     @app.callback(Output('experiment-nav', 'children'),
                   Input('dir-refresh', 'n_clicks'),
                   Input('experiment-filter', 'value'))
@@ -106,25 +106,22 @@ if __name__ == '__main__':
             filtered_projects = [p for p in get_projects(args.dir) if value in p]
         return populate_nav_bar(filtered_projects)
 
+
     @app.callback(Output('page-content', 'children'),
                   [Input('url', 'pathname')])
     def display_page(pathname="/"):
-        ctx = dash.callback_context
-        # triggered_by = ctx.triggered[0].get("prop_id")
-
         project_name = pathname.strip('/')
-        print(f'Project={project_name}')
         if project_name:
             page_layout = html.Div(children=[
                 html.Main(children=[
-                    'hi here'
+                    'Normal Distribution plot',
                     # tc.graph_panel(children=[
                     #     tp.generation_distribution(project_name)
                     # ]),
-                    # tc.graph_panel(children=[
-                    #     tp.fitness_vs_generation(project_name)
-                    # ])
-                ], className='grid grid-cols-2 gap-6 mt-20 mr-20'),
+                    tc.graph_panel(children=[
+                        tp.fitness_vs_generation(args.dir, project_name)
+                    ])
+                ], className='grid grid-cols-1 xl:grid-cols-2 gap-6 mt-20 mr-20'),
                 html.Div(children=[
                     'hi there'
                     # tc.graph_panel(children=[
