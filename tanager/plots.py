@@ -5,8 +5,8 @@ import sys
 import dash_core_components as dcc
 import dash_html_components as html
 import pandas as pd
-import plotly.express as px
 import plotly.figure_factory as ff
+import plotly.graph_objects as go
 
 
 def fitness_vs_generation(basedir, project_name):
@@ -20,9 +20,41 @@ def fitness_vs_generation(basedir, project_name):
             file = data_files[0]
             print(f"Reading in {file}")
             df = pd.read_csv(file)
-            fig = px.scatter(df, x='num_generations', y='average_fit', error_y='std_fit', trendline='lowess',
-                             title='Fitness vs Generation',
-                             labels={'num_generations': 'Generation', 'average_fit': 'Fitness'})
+            x = df['num_generations']
+            y = df['average_fit']
+            y_upper = y + df['std_fit']
+            y_lower = y - df['std_fit']
+            fig = go.Figure([
+                go.Scatter(
+                    name='Fitness',
+                    x=x, y=y,
+                    mode='lines',
+                    line=dict(color='rgb(31, 119, 180)'),
+                ),
+                go.Scatter(
+                    name='Upper Bound',
+                    x=x, y=y_upper,
+                    mode='lines',
+                    marker=dict(color="#444"),
+                    line=dict(width=0),
+                    showlegend=False
+                ),
+                go.Scatter(
+                    name='Lower Bound',
+                    x=x, y=y_lower,
+                    marker=dict(color="#444"),
+                    line=dict(width=0),
+                    mode='lines',
+                    fillcolor='rgba(68, 68, 68, 0.3)',
+                    fill='tonexty',
+                    showlegend=False
+                )
+            ])
+            fig.update_layout(
+                yaxis_title='Fitness',
+                title='Average Fitness vs Generation',
+                hovermode="x"
+            )
             return dcc.Graph(id='fitness_vs_generation', figure=fig, responsive=True, className="h-full w-full")
         else:
             print(f"No stats files found in {path.dirname(stats_path)}", file=sys.stderr)
