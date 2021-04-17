@@ -114,14 +114,16 @@ if __name__ == '__main__':
     def display_page(pathname="/"):
         project_name = pathname.strip('/')
         pathname = path.join(path.normpath(args.dir), project_name)
-        max_num_generations = tu.max_generations(pathname)
-        print(max_num_generations)
-        slider_increments = tu.slider_round(max_num_generations / 20)
-        print(f'Slider = {slider_increments}')
         if project_name:
+            num_generations = tu.num_generations(pathname)
+            slider_step = 1
+            num_slider_marks = 20
+            if num_generations > num_slider_marks:
+                slider_step = tu.slider_round(num_generations / num_slider_marks)
+
             page_layout = html.Div(children=[
+                html.H1(f'Project {project_name}', className='text-gray-400 font-bold text-5xl my-10'),
                 html.Main(children=[
-                    'Normal Distribution plot',
                     tc.graph_panel(children=[
                         tp.generation_distribution(pathname),
                         html.Div('Select Generation', className='self-start'),
@@ -129,16 +131,16 @@ if __name__ == '__main__':
                             id='my-slider',
                             className="w-full",
                             min=0,
-                            max=max_num_generations,
+                            max=num_generations,
                             step=1,
                             value=0,
-                            marks={i: f"{i}" for i in range(slider_increments)}
+                            marks={i: f"{i}" for i in range(0, num_generations + 1, slider_step)}
                         )
                     ]),
                     tc.graph_panel(children=[
                         tp.fitness_vs_generation(pathname),
                     ])
-                ], className='grid grid-cols-1 xl:grid-cols-2 gap-6 mt-20 mr-20'),
+                ], className='grid grid-cols-1 xl:grid-cols-2 gap-6 mr-20'),
                 html.Div(children=[
                     # tc.graph_panel(children=[
                     #     tp.generate_nework_graph(project_name)

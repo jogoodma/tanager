@@ -1,8 +1,14 @@
-def max_generations(pathname: str = None):
-    print(f'got {pathname}')
-    if pathname is not None:
+import glob
+import os.path as path
+
+
+def num_generations(pathname: str = None):
+    stats_path = path.join(pathname, 'tanager-statistics-file-*.csv')
+    stats_file = glob.glob(stats_path, recursive=False)[0]
+
+    if stats_file is not None:
         try:
-            with open(pathname, 'r') as fh:
+            with open(stats_file, 'r') as fh:
                 last_line = fh.readlines()[-1]
                 return int(last_line.split(',')[0])
         except IOError as e:
@@ -13,4 +19,4 @@ def max_generations(pathname: str = None):
 
 
 def slider_round(x, base=5):
-    return base * round(x/base)
+    return base * round(x / base)
