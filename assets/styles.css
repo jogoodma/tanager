@@ -635,6 +635,9 @@ video {
 .items-center {
 	align-items: center;
 }
+.items-start {
+	align-items: flex-start;
+}
 .justify-around {
 	justify-content: space-around;
 }
@@ -645,6 +648,9 @@ video {
 	--tw-space-x-reverse: 0;
 	margin-right: calc(1.25rem * var(--tw-space-x-reverse));
 	margin-left: calc(1.25rem * calc(1 - var(--tw-space-x-reverse)));
+}
+.self-start {
+	align-self: flex-start;
 }
 .overflow-y-auto {
 	overflow-y: auto;

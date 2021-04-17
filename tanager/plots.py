@@ -9,8 +9,8 @@ import plotly.figure_factory as ff
 import plotly.graph_objects as go
 
 
-def fitness_vs_generation(basedir, project_name):
-    stats_path = path.join(path.normpath(basedir), project_name, 'tanager-statistics-file-*.csv')
+def fitness_vs_generation(pathname):
+    stats_path = path.join(pathname, 'tanager-statistics-file-*.csv')
     data_files = glob.glob(stats_path, recursive=False)
     try:
         if len(data_files) >= 1:
@@ -65,9 +65,25 @@ def fitness_vs_generation(basedir, project_name):
     return html.H3(f'Error reading stats file.')
 
 
-def generation_distribution(project_name):
-    # print(request.host_url)
-    print(project_name)
-    df = pd.read_csv('data/experiment_1/sample_10i_10g.tsv', sep='\t')
-    fig = ff.create_distplot([df.iloc[9, 1:-2]], ['distplot'], show_rug=False, show_hist=False, curve_type="normal")
-    return dcc.Graph(id='generation_distribution', figure=fig, responsive=True, className="h-full w-full")
+def generation_distribution(pathname: str, generation: int = 0):
+    indvids_path = path.join(pathname, 'tanager-individuals-file-*.csv')
+    data_files = glob.glob(indvids_path, recursive=False)
+    try:
+        if len(data_files) >= 1:
+            if len(data_files) > 1:
+                print(f"More than one statistics file found in {path.dirname(indvids_path)}.", file=sys.stderr)
+                print("Only one file will be used.", file=sys.stderr)
+            file = data_files[0]
+            print(f"Reading in {file}")
+            df = pd.read_csv(file)
+            # Select all individuals for the given generation number.
+            fitness_vals = df[df["generation"].isin([generation])]["fitness"]
+            # fig = px.histogram(generation_df, x="fitness", show_hist=False, histnorm="probability density")
+            fig = ff.create_distplot([fitness_vals], [f"Generation {generation}"], show_rug=True, show_hist=False,
+                                     curve_type="normal")
+            fig.update_layout(title_text='Fitness Distribution')
+            return dcc.Graph(id='generation_distribution', figure=fig, responsive=True, className="h-full w-full")
+    except IOError as e:
+        return html.H3(f"ERROR: Caught an IOError while reading {file}:\n{e}")
+
+    return html.H3(f'Error reading stats file.')

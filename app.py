@@ -4,6 +4,7 @@
 
 import argparse
 import os
+import os.path as path
 
 import dash
 import dash_core_components as dcc
@@ -12,6 +13,7 @@ from dash.dependencies import Input, Output
 
 import tanager.components as tc
 import tanager.plots as tp
+import tanager.utils as tu
 
 
 def get_projects(path: str):
@@ -111,19 +113,33 @@ if __name__ == '__main__':
                   [Input('url', 'pathname')])
     def display_page(pathname="/"):
         project_name = pathname.strip('/')
+        pathname = path.join(path.normpath(args.dir), project_name)
+        max_num_generations = tu.max_generations(pathname)
+        print(max_num_generations)
+        slider_increments = tu.slider_round(max_num_generations / 20)
+        print(f'Slider = {slider_increments}')
         if project_name:
             page_layout = html.Div(children=[
                 html.Main(children=[
                     'Normal Distribution plot',
-                    # tc.graph_panel(children=[
-                    #     tp.generation_distribution(project_name)
-                    # ]),
                     tc.graph_panel(children=[
-                        tp.fitness_vs_generation(args.dir, project_name)
+                        tp.generation_distribution(pathname),
+                        html.Div('Select Generation', className='self-start'),
+                        dcc.Slider(
+                            id='my-slider',
+                            className="w-full",
+                            min=0,
+                            max=max_num_generations,
+                            step=1,
+                            value=0,
+                            marks={i: f"{i}" for i in range(slider_increments)}
+                        )
+                    ]),
+                    tc.graph_panel(children=[
+                        tp.fitness_vs_generation(pathname),
                     ])
                 ], className='grid grid-cols-1 xl:grid-cols-2 gap-6 mt-20 mr-20'),
                 html.Div(children=[
-                    'hi there'
                     # tc.graph_panel(children=[
                     #     tp.generate_nework_graph(project_name)
                     # ])
