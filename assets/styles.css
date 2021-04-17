@@ -557,6 +557,9 @@ video {
 	--tw-ring-offset-shadow: 0 0 #0000;
 	--tw-ring-shadow: 0 0 #0000;
 }
+.col-span-2 {
+	grid-column: span 2 / span 2;
+}
 .my-10 {
 	margin-top: 2.5rem;
 	margin-bottom: 2.5rem;
