@@ -52,11 +52,11 @@ def graph_panel(*args, **kwargs):
     return html.Section(*args, className=classname, **kwargs)
 
 
-def get_default_page():
+def get_default_page(config):
     return html.Div(children=[
-        html.H1("Welcome to Tanager!", className="text-6xl font-bold alert-heading"),
+        html.H1(config['title'], className="text-6xl font-bold alert-heading"),
         html.H2(
-            "Tanager allows you to visualize Inspyred. ",
+        config['description'],   #"Tanager allows you to visualize Inspyred. "
             className='text-2xl text-gray-400 ml-10'
         ),
         html.Hr(className='border border-black'),

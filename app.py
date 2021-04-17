@@ -15,6 +15,8 @@ import tanager.components as tc
 import tanager.plots as tp
 import tanager.utils as tu
 
+import json
+
 
 def get_projects(path: str):
     projects = []
@@ -44,7 +46,7 @@ def prepare_dash_server(projects):
         dcc.Location(id='url', refresh=False),
         tc.navbar(id='experiment-nav', children=navbar),
         # content will be rendered in this element
-        html.Div(id='page-content', children=tc.get_default_page(), className='w-full bg-gray-100 pl-20')
+        html.Div(id='page-content', children=tc.get_default_page(tanager_config), className='w-full bg-gray-100 pl-20')
     ], className='min-h-screen flex flex-row')
 
     return app
@@ -62,38 +64,56 @@ def populate_nav_bar(projects):
 
 
 # Global Area
+tanager_config = None
+tangager_data_folder = None
+tanager_debug_flag = True
+
+def get_tanager_config():
+    global tanager_config
+    if not tanager_config:
+        config_file = open("./tanager-config.json",'r')
+        tanager_config = json.load(config_file)
+    return tanager_config
+
 # Create the parser
 parser = argparse.ArgumentParser(
     prog='app',
-    usage='%(prog)s [options] dir',
+    usage='%(prog)s [options] [dir]',
     description='Tanager - visualize Inspyred evolutionary computations.')
 
 parser.add_argument('-debug', action="store_true", default=False, help="Run in debug mode.")
-parser.add_argument('dir', type=str, help="Directory containing observer files.")
+parser.add_argument('dir', type=str, help="Directory containing observer files.", nargs="?")
 args = parser.parse_args()
+if args.dir:
+    tangager_data_folder = args.dir
+else:
+    tangager_data_folder = get_tanager_config()['data-folder']
+
+if args.debug:
+    tanager_debug_flag = True
 
 if __name__ == '__main__':
-    projects = get_projects(args.dir)
+    get_tanager_config()
+    projects = get_projects(tangager_data_folder)
     app = prepare_dash_server(projects)
-
 
     @app.callback(Output('experiment-nav', 'children'),
                   Input('dir-refresh', 'n_clicks'),
                   Input('experiment-filter', 'value'))
     def refresh_onclick(n_clicks, value):
         if value is None:
-            filtered_projects = get_projects(args.dir)
+            filtered_projects = get_projects(tangager_data_folder)
         else:
-            filtered_projects = [p for p in get_projects(args.dir) if value in p]
+            filtered_projects = [p for p in get_projects(tangager_data_folder) if value in p]
         return populate_nav_bar(filtered_projects)
-
 
     @app.callback(Output('page-content', 'children'),
                   [Input('url', 'pathname')])
     def display_page(pathname="/"):
         project_name = pathname.strip('/')
-        pathname = path.join(path.normpath(args.dir), project_name)
-        if project_name:
+        if project_name and len(project_name) > 0:
+            pathname = path.join(path.normpath(tangager_data_folder),
+                                 project_name)
             num_generations = tu.num_generations(pathname)
             slider_step = 1
             num_slider_marks = 20
@@ -118,17 +138,15 @@ if __name__ == '__main__':
                     ]),
                     tc.graph_panel(children=[
                         tp.fitness_vs_generation(pathname),
-                    ])
+                    ]),
+                    tc.graph_panel(children=[
+                        tp.generation_network_graph(project_name, pathname)
+                    ], className='col-span-2')
                 ], className='grid grid-cols-1 2xl:grid-cols-2 gap-6 mr-20'),
-                html.Div(children=[
-                    # tc.graph_panel(children=[
-                    #     tp.generate_nework_graph(project_name)
-                    # ])
-                ], className='gap-6')
             ], className='w-full bg-gray-100 pl-20')
         else:
-            page_layout = tc.get_default_page()
+            page_layout = tc.get_default_page(tanager_config)
         return page_layout
 
-
-    app.run_server(debug=args.debug)
+    app.title = tanager_config['name']
+    app.run_server(debug=tanager_debug_flag)

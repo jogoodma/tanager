@@ -7,10 +7,10 @@ import dash_html_components as html
 import pandas as pd
 import plotly.figure_factory as ff
 import plotly.graph_objects as go
-
-
+from . import networkgraph as gc
+import numpy as np
 def fitness_vs_generation(pathname):
-    stats_path = path.join(pathname, 'tanager-statistics-file-*.csv')
+    stats_path = path.join(pathname, 'tanager-statistics-file.csv')
     data_files = glob.glob(stats_path, recursive=False)
     try:
         if len(data_files) >= 1:
@@ -66,7 +66,7 @@ def fitness_vs_generation(pathname):
 
 
 def generation_distribution(pathname: str, generation: int = 0, plot_id: str = 'gen-dist-plot'):
-    indvids_path = path.join(pathname, 'tanager-individuals-file-*.csv')
+    indvids_path = path.join(pathname, 'tanager-individuals-file.csv')
     data_files = glob.glob(indvids_path, recursive=False)
     try:
         if len(data_files) >= 1:
@@ -82,6 +82,25 @@ def generation_distribution(pathname: str, generation: int = 0, plot_id: str = '
             fig = ff.create_distplot([fitness_vals], [f"Generation {generation}"], show_rug=True, show_hist=False,
                                      curve_type="normal")
             fig.update_layout(title_text='Fitness Distribution')
+            return dcc.Graph(id=plot_id, figure=fig, responsive=True, className="h-full w-full")
+    except IOError as e:
+        return html.H3(f"ERROR: Caught an IOError while reading {file}:\n{e}")
+
+    return html.H3(f'Error reading stats file.')
+
+def generation_network_graph(project_name, pathname: str, generation: tuple = (0, np.inf), plot_id: str = 'gen-network-plot'):
+    indvids_path = path.join(pathname, 'tanager-individuals-file.csv')
+    data_files = glob.glob(indvids_path, recursive=False)
+    try:
+        if len(data_files) >= 1:
+            if len(data_files) > 1:
+                print(f"More than one statistics file found in {path.dirname(indvids_path)}.", file=sys.stderr)
+                print("Only one file will be used.", file=sys.stderr)
+            file = data_files[0]
+            print(f"Reading in {file}")
+            df = pd.read_csv(file)
+            fig = gc.createNetworkGraph(project_name, df)
+            #fig.update_layout(title_text='Fitness Distribution')
             return dcc.Graph(id=plot_id, figure=fig, responsive=True, className="h-full w-full")
     except IOError as e:
         return html.H3(f"ERROR: Caught an IOError while reading {file}:\n{e}")

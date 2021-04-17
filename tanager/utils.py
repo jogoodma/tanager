@@ -3,7 +3,7 @@ import os.path as path
 
 
 def num_generations(pathname: str = None):
-    stats_path = path.join(pathname, 'tanager-statistics-file-*.csv')
+    stats_path = path.join(pathname, 'tanager-statistics-file.csv')
     stats_file = glob.glob(stats_path, recursive=False)[0]
 
     if stats_file is not None:
