@@ -65,7 +65,7 @@ def fitness_vs_generation(pathname):
     return html.H3(f'Error reading stats file.')
 
 
-def generation_distribution(pathname: str, generation: int = 0):
+def generation_distribution(pathname: str, generation: int = 0, plot_id: str = 'gen-dist-plot'):
     indvids_path = path.join(pathname, 'tanager-individuals-file-*.csv')
     data_files = glob.glob(indvids_path, recursive=False)
     try:
@@ -82,7 +82,7 @@ def generation_distribution(pathname: str, generation: int = 0):
             fig = ff.create_distplot([fitness_vals], [f"Generation {generation}"], show_rug=True, show_hist=False,
                                      curve_type="normal")
             fig.update_layout(title_text='Fitness Distribution')
-            return dcc.Graph(id='generation_distribution', figure=fig, responsive=True, className="h-full w-full")
+            return dcc.Graph(id=plot_id, figure=fig, responsive=True, className="h-full w-full")
     except IOError as e:
         return html.H3(f"ERROR: Caught an IOError while reading {file}:\n{e}")
 

@@ -73,7 +73,7 @@ Tailwind CSS client as the pre-built css files should already be in place.
 To produce the final CSS file that gets included into the app you need to run:
 
 ```
-yarn run build:css
+yarn run build
 ```
 
 This takes the [css/tailwind.css](css/tailwind.css) file and runs it through the Tailwind CSS client to produce the

@@ -50,27 +50,6 @@ def prepare_dash_server(projects):
     return app
 
 
-def get_tanager_layouts():
-    tanager_layouts = {}
-
-    tanager_layouts['Project'] = html.Div(children=[
-        html.Main(children=[
-            tc.graph_panel(children=[
-                tp.generation_distribution('Rastrigin')
-            ]),
-            tc.graph_panel(children=[
-                tp.fitness_vs_generation('Rastrigin')
-            ])
-        ], className='grid grid-cols-2 gap-6 mt-20 mr-20'),
-        html.Div(children=[
-            tc.graph_panel(children=[
-                tp.generate_nework_graph('Rastrigin')
-            ])], className='gap-6')
-    ], className='w-full bg-gray-100 pl-20')
-
-    return tanager_layouts
-
-
 def populate_nav_bar(projects):
     tanager_nav_children = []
     projects.sort()
@@ -128,7 +107,7 @@ if __name__ == '__main__':
                         tp.generation_distribution(pathname),
                         html.Div('Select Generation', className='self-start'),
                         dcc.Slider(
-                            id='my-slider',
+                            id='gen-dist-slider',
                             className="w-full",
                             min=0,
                             max=num_generations,
@@ -140,7 +119,7 @@ if __name__ == '__main__':
                     tc.graph_panel(children=[
                         tp.fitness_vs_generation(pathname),
                     ])
-                ], className='grid grid-cols-1 xl:grid-cols-2 gap-6 mr-20'),
+                ], className='grid grid-cols-1 2xl:grid-cols-2 gap-6 mr-20'),
                 html.Div(children=[
                     # tc.graph_panel(children=[
                     #     tp.generate_nework_graph(project_name)
