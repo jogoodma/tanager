@@ -1,8 +1,6 @@
 import plotly.graph_objects as go
 import pandas as pd
 import datetime
-import os
-import networkx as nx
 
 def conv(s):
     try:
