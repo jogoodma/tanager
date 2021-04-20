@@ -9,7 +9,7 @@ def navbar(*args, **kwargs):
 
     return html.Div(children=[
         html.Div(children=[
-            html.A(href="/", children=[
+            dcc.Link(href="/", children=[
                 html.I(className="fab fa-earlybirds mr-3"),
                 html.Span(children='Tanager', className="font-semibold")
             ]),
@@ -40,7 +40,7 @@ def navbar_item(*args, **kwargs):
     children.append(*args)
     children.insert(0, html.I(className='fas fa-chart-bar mx-3'))
 
-    return html.A(
+    return dcc.Link(
         className='flex items-center py-2 px-6 text-gray-500 hover:bg-gray-700 hover:bg-opacity-25 hover:text-gray-100',
         children=children,
         **kwargs

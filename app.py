@@ -147,7 +147,7 @@ if __name__ == '__main__':
                     ]),
                     tc.graph_panel(children=[
                         tp.generation_network_graph(pathname)
-                    ])
+                    ], className='2xl:col-span-2')
                 ], className='grid grid-cols-1 2xl:grid-cols-2 gap-6 mr-20'),
             ], className='w-full bg-gray-100 pl-20')
         else:
