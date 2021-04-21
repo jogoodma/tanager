@@ -114,11 +114,11 @@ if __name__ == '__main__':
         if project_name and len(project_name) > 0:
             pathname = path.join(path.normpath(tangager_data_folder),
                                  project_name)
-            num_generations = tu.num_generations(pathname)
+            generation = tu.num_generations(pathname)
             slider_step = 1
             num_slider_marks = 20
-            if num_generations > num_slider_marks:
-                slider_step = tu.slider_round(num_generations / num_slider_marks)
+            if generation > num_slider_marks:
+                slider_step = tu.slider_round(generation / num_slider_marks)
 
             page_layout = html.Div(children=[
                 html.H1(f'Project {project_name}', className='text-gray-400 font-bold text-5xl my-10'),
@@ -130,17 +130,23 @@ if __name__ == '__main__':
                             id='gen-dist-slider',
                             className="w-full",
                             min=0,
-                            max=num_generations,
+                            max=generation,
                             step=1,
                             value=0,
-                            marks={i: f"{i}" for i in range(0, num_generations + 1, slider_step)}
+                            marks={i: f"{i}" for i in range(0, generation + 1, slider_step)}
                         )
                     ]),
                     tc.graph_panel(children=[
                         tp.fitness_vs_generation(pathname),
                     ]),
                     tc.graph_panel(children=[
-                        tp.generation_network_graph(project_name, pathname)
+                        tp.plot_ec_stats(pathname),
+                    ]),
+                    tc.graph_panel(children=[
+                        tp.plot_ec_population(pathname),
+                    ]),
+                    tc.graph_panel(children=[
+                        tp.generation_network_graph(pathname)
                     ], className='2xl:col-span-2')
                 ], className='grid grid-cols-1 2xl:grid-cols-2 gap-6 mr-20'),
             ], className='w-full bg-gray-100 pl-20')

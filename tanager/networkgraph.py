@@ -1,6 +1,5 @@
 import plotly.graph_objects as go
 import pandas as pd
-import datetime
 
 def conv(s):
     try:
@@ -41,7 +40,7 @@ def setColor(fitness):
 
     return clr
 
-def createNetworkGraph(project_name, data):
+def createNetworkGraph(data):
     node_x = []
     node_y = []
     node_text = []
@@ -84,7 +83,7 @@ def createNetworkGraph(project_name, data):
 
     fig = go.Figure(data=node_trace,
                  layout=go.Layout(
-                    title=f'Evolution Graph {project_name} at {datetime.datetime.now()}',
+                    title='Evolution Network Graph',
                     xaxis_title='Generation',
                     yaxis_title='Candidate',
                     titlefont_size=16,
@@ -102,7 +101,7 @@ def createNetworkGraph(project_name, data):
                         title="price",
                         linecolor="#BCCCDC"
                     ),
-                    showlegend=True,
+                    showlegend=False,
                     hovermode='closest',
                     margin=dict(b=20,l=5,r=5,t=40)
                     )
