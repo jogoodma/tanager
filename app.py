@@ -3,6 +3,7 @@
 # visit http://127.0.0.1:8050/ in your web browser.
 
 import argparse
+import json
 import os
 import os.path as path
 
@@ -14,8 +15,6 @@ from dash.dependencies import Input, Output
 import tanager.components as tc
 import tanager.plots as tp
 import tanager.utils as tu
-
-import json
 
 
 def get_projects(path: str):
@@ -68,12 +67,14 @@ tanager_config = None
 tangager_data_folder = None
 tanager_debug_flag = True
 
+
 def get_tanager_config():
     global tanager_config
     if not tanager_config:
-        config_file = open("./tanager-config.json",'r')
+        config_file = open("./tanager-config.json", 'r')
         tanager_config = json.load(config_file)
     return tanager_config
+
 
 # Create the parser
 parser = argparse.ArgumentParser(
@@ -97,6 +98,7 @@ if __name__ == '__main__':
     projects = get_projects(tangager_data_folder)
     app = prepare_dash_server(projects)
 
+
     @app.callback(Output('experiment-nav', 'children'),
                   Input('dir-refresh', 'n_clicks'),
                   Input('experiment-filter', 'value'))
@@ -106,6 +108,7 @@ if __name__ == '__main__':
         else:
             filtered_projects = [p for p in get_projects(tangager_data_folder) if value in p]
         return populate_nav_bar(filtered_projects)
+
 
     @app.callback(Output('page-content', 'children'),
                   [Input('url', 'pathname')])
@@ -153,6 +156,7 @@ if __name__ == '__main__':
         else:
             page_layout = tc.get_default_page(tanager_config)
         return page_layout
+
 
     app.title = tanager_config['name']
     app.run_server(debug=tanager_debug_flag)

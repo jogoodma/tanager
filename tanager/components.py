@@ -56,7 +56,7 @@ def get_default_page(config):
     return html.Div(children=[
         html.H1(config['title'], className="text-6xl font-bold alert-heading"),
         html.H2(
-        config['description'],   #"Tanager allows you to visualize Inspyred. "
+            config['description'],  # "Tanager allows you to visualize Inspyred. "
             className='text-2xl text-gray-400 ml-10'
         ),
         html.Hr(className='border border-black'),

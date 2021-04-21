@@ -1,5 +1,6 @@
-import plotly.graph_objects as go
 import pandas as pd
+import plotly.graph_objects as go
+
 
 def conv(s):
     try:
@@ -11,9 +12,11 @@ def conv(s):
         except ValueError:
             return -1
 
+
 def readfile(data_file):
-    data = pd.read_csv(data_file) #, converters={'mom_hash':conv}
+    data = pd.read_csv(data_file)  # , converters={'mom_hash':conv}
     return data
+
 
 def makeInt(item):
     str_item = None
@@ -24,21 +27,23 @@ def makeInt(item):
             str_item = str(item)
     return str_item
 
+
 # function below sets the color based on amount
 def setColor(fitness):
     range = int(format(fitness, '.0f'))
     clr = 'grey'
-    if(range > 50):
+    if (range > 50):
         clr = "red"
-    elif(range >= 10 and range <= 50):
+    elif (range >= 10 and range <= 50):
         clr = "yellow"
-    elif(range < 10):
+    elif (range < 10):
         clr = "green"
 
     if clr == 'grey':
         print(clr)
 
     return clr
+
 
 def createNetworkGraph(data):
     node_x = []
@@ -77,37 +82,37 @@ def createNetworkGraph(data):
         #     titleside='right'
         # )),
         marker=dict(size=1, line_width=1, color=node_fitness),
-        #marker = dict(color=list(map(SetColor, y))
+        # marker = dict(color=list(map(SetColor, y))
         hoverinfo='text'
     )
 
     fig = go.Figure(data=node_trace,
-                 layout=go.Layout(
-                    title='Evolution Network Graph',
-                    xaxis_title='Generation',
-                    yaxis_title='Candidate',
-                    titlefont_size=16,
-                    plot_bgcolor="#FFFFFF",
-                    legend=dict(
-                         # Adjust click behavior
-                         #itemclick="toggleothers",
-                         itemdoubleclick="toggle",
-                    ),
-                    xaxis=dict(
-                        title="time",
-                        linecolor="#BCCCDC",
-                    ),
-                    yaxis=dict(
-                        title="price",
-                        linecolor="#BCCCDC"
-                    ),
-                    showlegend=False,
-                    hovermode='closest',
-                    margin=dict(b=20,l=5,r=5,t=40)
+                    layout=go.Layout(
+                        title='Evolution Network Graph',
+                        xaxis_title='Generation',
+                        yaxis_title='Candidate',
+                        titlefont_size=16,
+                        plot_bgcolor="#FFFFFF",
+                        legend=dict(
+                            # Adjust click behavior
+                            # itemclick="toggleothers",
+                            itemdoubleclick="toggle",
+                        ),
+                        xaxis=dict(
+                            title="time",
+                            linecolor="#BCCCDC",
+                        ),
+                        yaxis=dict(
+                            title="price",
+                            linecolor="#BCCCDC"
+                        ),
+                        showlegend=False,
+                        hovermode='closest',
+                        margin=dict(b=20, l=5, r=5, t=40)
                     )
-                )
+                    )
 
-    #Add parent lines.
+    # Add parent lines.
     for trace in mom_traces:
         fig.add_trace(trace)
 
@@ -115,6 +120,7 @@ def createNetworkGraph(data):
         fig.add_trace(trace)
 
     return fig
+
 
 def getNetworkEdges(data):
     mom_traces = []
@@ -125,7 +131,7 @@ def getNetworkEdges(data):
 
     for generation in generations:
         if generation == 0:
-            #collect the hover text.
+            # collect the hover text.
             this_generation_rows = data[data['generation'] == generation]
             for index, row in this_generation_rows.iterrows():
                 candidate_value = row["values"]
@@ -149,7 +155,7 @@ def getNetworkEdges(data):
 
                 this_generation_rows = data[data['generation'] == generation]
 
-                #Generate the edges.
+                # Generate the edges.
                 for index, row in this_generation_rows.iterrows():
                     candidate_value = row["values"]
                     candidate_fitness = row["fitness"]
@@ -161,7 +167,7 @@ def getNetworkEdges(data):
 
                     if mom_hash and mom_hash in prev_gen_data.keys():
                         mom_row = prev_gen_data[mom_hash]
-                        edge_mom_x.append(generation-1)
+                        edge_mom_x.append(generation - 1)
                         edge_mom_y.append(mom_row["i"])
                         edge_mom_x.append(generation)
                         edge_mom_y.append(row["i"])
@@ -169,7 +175,7 @@ def getNetworkEdges(data):
                                           f"Parent1=[{mom_row['values']}]"
                     if dad_hash and (mom_hash != dad_hash) and dad_hash in prev_gen_data.keys():
                         dad_row = prev_gen_data[dad_hash]
-                        edge_dad_x.append(generation-1)
+                        edge_dad_x.append(generation - 1)
                         edge_dad_y.append(dad_row["i"])
                         edge_dad_x.append(generation)
                         edge_dad_y.append(row["i"])
@@ -192,43 +198,45 @@ def getNetworkEdges(data):
 
                 mom_traces.append(edge_mom_trace)
                 dad_traces.append(edge_dad_trace)
-                #fig.add_trace(edge_mom_trace)
-                #fig.add_trace(edge_dad_trace)
+                # fig.add_trace(edge_mom_trace)
+                # fig.add_trace(edge_dad_trace)
 
             except Exception as e:
                 print(e)
 
-            #fig.update_traces(mode="markers+lines")
-            #fig.update_layout(hovermode="closest")
-            #fig.text(edge_hover_text)
+            # fig.update_traces(mode="markers+lines")
+            # fig.update_layout(hovermode="closest")
+            # fig.text(edge_hover_text)
 
     #   pd.reset_option.display
 
     return mom_traces, dad_traces, edge_hover_dict
 
+
 def showNetworkGraph(project_name, data):
     fig = createNetworkGraph(project_name, data)
     fig.show()
 
+
 inspyred_data_folder = "/System/Volumes/Data/Personal/Degree/Tools/Inspyred/Code/Git/inspyred/tanager_data"
 
 if __name__ == '__main__':
-    projects = ['Rastrigin','Sphere', 'Ackley', 'Rosenbrock', 'TSM']
-    #chart_types = ['BestFit', 'AllGenerations', 'Network']
+    projects = ['Rastrigin', 'Sphere', 'Ackley', 'Rosenbrock', 'TSM']
+    # chart_types = ['BestFit', 'AllGenerations', 'Network']
 
-    #choosen_problem = f'{problem_types[0]}_{chart_types[2]}'
+    # choosen_problem = f'{problem_types[0]}_{chart_types[2]}'
     inspyred_data_folder = "/System/Volumes/Data/Personal/Degree/Tools/Inspyred/Code/Git/inspyred/tanager_data"
 
     for project in projects:
-        #data_filename = f'{inspyred_data_folder}/{project}/tanager-individuals-file.csv'
+        # data_filename = f'{inspyred_data_folder}/{project}/tanager-individuals-file.csv'
         print(f"###### Generate Graph {project} ###############")
-        #Generate the graph.
+        # Generate the graph.
         data_filename = f'{inspyred_data_folder}/{project}/tanager-individuals-file.csv'
         data = readfile(data_filename)
 
         fig = showNetworkGraph(project, data)
-        #fig.show()
-        #break
-        #data_full_path = os.path.realpath(data_filename)
+        # fig.show()
+        # break
+        # data_full_path = os.path.realpath(data_filename)
         # print(data_full_path)
-        #data = readfile(data_filename)
+        # data = readfile(data_filename)

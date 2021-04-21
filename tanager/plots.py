@@ -4,12 +4,14 @@ import sys
 
 import dash_core_components as dcc
 import dash_html_components as html
+import numpy as np
 import pandas as pd
 import plotly.figure_factory as ff
 import plotly.graph_objects as go
+
 from . import networkgraph as gc
 from . import populationplots as pp
-import numpy as np
+
 
 def read_file(pathname, filename, generation_filter):
     df = None
@@ -26,7 +28,7 @@ def read_file(pathname, filename, generation_filter):
             all_df = pd.read_csv(file)
             if generation_filter:
                 df = all_df[all_df.generation.between(generation_filter[0], generation_filter[1])]
-            else :
+            else:
                 df = all_df
         else:
             alt = html.H3(f'No data file found with name {filename}.')
@@ -35,6 +37,7 @@ def read_file(pathname, filename, generation_filter):
     except ValueError as e:
         alt = html.H3(f"ERROR: Caught a ValueError while reading {filename}:\n{e}")
     return df, alt
+
 
 def get_graph_config():
     config = {
@@ -47,6 +50,7 @@ def get_graph_config():
         'sendData': False
     }
     return config
+
 
 def fitness_vs_generation(pathname: str, generation: tuple = (0, 0), plot_id: str = 'fitness_vs_generation'):
     df, alt = read_file(pathname, 'tanager-statistics-file.csv', None)
@@ -91,9 +95,11 @@ def fitness_vs_generation(pathname: str, generation: tuple = (0, 0), plot_id: st
             hovermode="x"
         )
 
-        plot_div = dcc.Graph(id=plot_id, figure=fig, responsive=True, className="h-full w-full", config=get_graph_config())
+        plot_div = dcc.Graph(id=plot_id, figure=fig, responsive=True, className="h-full w-full",
+                             config=get_graph_config())
 
     return plot_div
+
 
 def generation_distribution(pathname: str, generation: int = 0, plot_id: str = 'gen-dist-plot'):
     df, alt = read_file(pathname, 'tanager-individuals-file.csv', None)
@@ -107,9 +113,11 @@ def generation_distribution(pathname: str, generation: int = 0, plot_id: str = '
         fig = ff.create_distplot([fitness_vals], [f"Generation {generation}"], show_rug=True, show_hist=False,
                                  curve_type="normal")
         fig.update_layout(title_text='Fitness Distribution')
-        plot_div = dcc.Graph(id=plot_id, figure=fig, responsive=True, className="h-full w-full", config=get_graph_config())
+        plot_div = dcc.Graph(id=plot_id, figure=fig, responsive=True, className="h-full w-full",
+                             config=get_graph_config())
 
     return plot_div
+
 
 def generation_network_graph(pathname: str, generation: tuple = (np.NINF, np.inf), plot_id: str = 'gen-network-plot'):
     df, alt = read_file(pathname, 'tanager-individuals-file.csv', generation)
@@ -118,9 +126,11 @@ def generation_network_graph(pathname: str, generation: tuple = (np.NINF, np.inf
         plot_div = alt
     else:
         fig = gc.createNetworkGraph(df)
-        plot_div = dcc.Graph(id=plot_id, figure=fig, responsive=True, className="h-full w-full", config=get_graph_config())
+        plot_div = dcc.Graph(id=plot_id, figure=fig, responsive=True, className="h-full w-full",
+                             config=get_graph_config())
 
     return plot_div
+
 
 def plot_ec_population(pathname: str, generation: tuple = (np.NINF, np.inf), plot_id: str = 'ec-population-plot'):
     df, alt = read_file(pathname, 'tanager-individuals-file.csv', generation)
@@ -129,7 +139,8 @@ def plot_ec_population(pathname: str, generation: tuple = (np.NINF, np.inf), plo
         plot_div = alt
     else:
         fig = pp.plot_ec_population(df)
-        plot_div = dcc.Graph(id=plot_id, figure=fig, responsive=True, className="h-full w-full", config=get_graph_config())
+        plot_div = dcc.Graph(id=plot_id, figure=fig, responsive=True, className="h-full w-full",
+                             config=get_graph_config())
 
     return plot_div
 
@@ -150,12 +161,14 @@ def plot_ec_stats(pathname: str, generation: tuple = (np.NINF, np.inf), plot_id:
 
     return plot_div
 
-def plot_stats_table(pathname: str, num_rows: int=10):
+
+def plot_stats_table(pathname: str, num_rows: int = 10):
     df, alt = read_file(pathname, 'tanager-statistics-file.csv', None)
     table = ff.create_table(df.head(num_rows))
-    #py.iplot(table)
+    # py.iplot(table)
 
-def plot_individual_table(pathname: str, num_rows: int=10):
+
+def plot_individual_table(pathname: str, num_rows: int = 10):
     df, alt = read_file(pathname, 'tanager-individuals-file.csv', None)
     table = ff.create_table(df.head(num_rows))
-    #py.iplot(table)
+    # py.iplot(table)
