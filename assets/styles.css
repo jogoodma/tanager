@@ -603,8 +603,8 @@ video {
 .h-5\/6 {
 	height: 83.333333%;
 }
-.h-screen {
-	height: 100vh;
+.h-auto {
+	height: auto;
 }
 .h-full {
 	height: 100%;

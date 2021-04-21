@@ -28,7 +28,7 @@ def navbar(*args, **kwargs):
                         ]),
         ], className='flex justify-around my-4'),
         html.Nav(*args, className="overflow-y-auto h-5/6", **kwargs)
-    ], className='w-52 lg:w-64 bg-gray-900 flex flex-col flex-none text-center h-screen'
+    ], className='w-52 lg:w-64 bg-gray-900 flex flex-col flex-none text-center h-auto'
     )
 
 
