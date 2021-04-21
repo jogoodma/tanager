@@ -1,4 +1,4 @@
-num_generations,population_length,worst_fit,best_fit,median_fit,average_fit,std_fit,best_fit_candidate_hash
+generation,population_length,worst_fit,best_fit,median_fit,average_fit,std_fit,best_fit_candidate_hash
 0,150,-206,-15,-111.0,-109.03333333333333,39.39702470435497,1269222559789769500
 1,150,-178,135,-91.0,-90.08,40.175368905172064,6265155435166828671
 2,150,-157,-6,-79.0,-77.76,31.487072479564265,-4727825733560838976
