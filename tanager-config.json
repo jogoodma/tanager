@@ -3,7 +3,12 @@
   "version": "0.1.0",
   "title": "Welcome to Tanager!",
   "description": "A dashboard visualization tool for Inspyred",
-  "author": "Josh Goodman <jogoodma@iu.edu>",
+  "authors": [
+    "Josh Goodman <jogoodma@iu.edu>",
+    "Rahul Dharmchand",
+    "Nick Solano",
+    "Gregory Bond"
+  ],
   "data-folder": "/System/Volumes/Data/Personal/Degree/Tools/Inspyred/Code/Git/inspyred/tanager_data",
   "displayModeBar": "True"
 }

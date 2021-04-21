@@ -3,6 +3,11 @@
   "version": "0.1.0",
   "description": "A dashboard visualization tool for Inspyred",
   "author": "Josh Goodman <jogoodma@iu.edu>",
+  "contributors": [
+    "Rahul Dharmchand",
+    "Nick Solano",
+    "Gregory Bond"
+  ],
   "license": "MIT",
   "scripts": {
     "dev": "NODE_ENV=development postcss ./css/tailwind.css -o ./assets/styles.css -w",
