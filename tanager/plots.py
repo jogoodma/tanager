@@ -11,6 +11,7 @@ import plotly.graph_objects as go
 
 from . import networkgraph as gc
 from . import populationplots as pp
+import tanager.utils as tu
 
 
 def read_file(pathname, filename, generation_filter):
@@ -52,114 +53,97 @@ def get_graph_config():
     return config
 
 
-def fitness_vs_generation(pathname: str, generation: tuple = (0, 0), plot_id: str = 'fitness_vs_generation'):
-    df, alt = read_file(pathname, 'tanager-statistics-file.csv', None)
+def fitness_vs_generation(stats_df: pd.DataFrame, plot_id: str = 'fitness_vs_generation'):
+    x = stats_df['generation']
+    y = stats_df['average_fit']
+    y_upper = y + stats_df['std_fit']
+    y_lower = y - stats_df['std_fit']
 
-    if alt:
-        plot_div = alt
-    else:
-        x = df['generation']
-        y = df['average_fit']
-        y_upper = y + df['std_fit']
-        y_lower = y - df['std_fit']
-
-        fig = go.Figure([
-            go.Scatter(
-                name='Fitness',
-                x=x, y=y,
-                mode='lines',
-                line=dict(color='rgb(31, 119, 180)'),
-            ),
-            go.Scatter(
-                name='Upper Bound',
-                x=x, y=y_upper,
-                mode='lines',
-                marker=dict(color="#444"),
-                line=dict(width=0),
-                showlegend=False
-            ),
-            go.Scatter(
-                name='Lower Bound',
-                x=x, y=y_lower,
-                marker=dict(color="#444"),
-                line=dict(width=0),
-                mode='lines',
-                fillcolor='rgba(68, 68, 68, 0.3)',
-                fill='tonexty',
-                showlegend=False
-            )
-        ])
-        fig.update_layout(
-            yaxis_title='Fitness',
-            title='Average Fitness vs Generation',
-            hovermode="x"
+    fig = go.Figure([
+        go.Scatter(
+            name='Fitness',
+            x=x, y=y,
+            mode='lines',
+            line=dict(color='rgb(31, 119, 180)'),
+        ),
+        go.Scatter(
+            name='Upper Bound',
+            x=x, y=y_upper,
+            mode='lines',
+            marker=dict(color="#444"),
+            line=dict(width=0),
+            showlegend=False
+        ),
+        go.Scatter(
+            name='Lower Bound',
+            x=x, y=y_lower,
+            marker=dict(color="#444"),
+            line=dict(width=0),
+            mode='lines',
+            fillcolor='rgba(68, 68, 68, 0.3)',
+            fill='tonexty',
+            showlegend=False
         )
+    ])
+    fig.update_layout(
+        yaxis_title='Fitness',
+        title='Average Fitness vs Generation',
+        hovermode="x"
+    )
 
-        plot_div = dcc.Graph(id=plot_id, figure=fig, responsive=True, className="h-full w-full",
+    return dcc.Graph(id=plot_id, figure=fig, responsive=True, className="h-full w-full",
+                         config=get_graph_config())
+
+
+def generation_distribution(stats_df: pd.DataFrame, generation: int = 0):
+    # Select all individuals for the given generation number.
+    fitness_vals = stats_df[stats_df["generation"].isin([generation])]["fitness"]
+    fig = ff.create_distplot([fitness_vals], [f"Generation {generation}"], show_rug=True, show_hist=False,
+                             curve_type="normal")
+    fig.update_layout(title_text='Fitness Distribution')
+    return fig
+
+# def generation_distribution(pathname: str, generation: int = 0, plot_id: str = 'gen-dist-plot'):
+#     df, alt = read_file(pathname, 'tanager-individuals-file.csv', None)
+#
+#     if alt:
+#         plot_div = alt
+#     else:
+#         # Select all individuals for the given generation number.
+#         fitness_vals = df[df["generation"].isin([generation])]["fitness"]
+#         # fig = px.histogram(generation_df, x="fitness", show_hist=False, histnorm="probability density")
+#         fig = ff.create_distplot([fitness_vals], [f"Generation {generation}"], show_rug=True, show_hist=False,
+#                                  curve_type="normal")
+#         fig.update_layout(title_text='Fitness Distribution')
+#         plot_div = dcc.Graph(id=plot_id, figure=fig, responsive=True, className="h-full w-full",
+#                              config=get_graph_config())
+#
+#     return plot_div
+
+
+def generation_network_graph(df: pd.DataFrame, generation: tuple = (np.NINF, np.inf), plot_id: str = 'gen-network-plot'):
+    filtered_df = tu.filter_generation(df, generation)
+    fig = gc.createNetworkGraph(filtered_df)
+    return dcc.Graph(id=plot_id, figure=fig, responsive=True, className="h-full w-full",
                              config=get_graph_config())
 
-    return plot_div
 
+def plot_ec_population(df: pd.DataFrame, generation: tuple = (np.NINF, np.inf), plot_id: str = 'ec-population-plot'):
+    filtered_df = tu.filter_generation(df, generation)
 
-def generation_distribution(pathname: str, generation: int = 0, plot_id: str = 'gen-dist-plot'):
-    df, alt = read_file(pathname, 'tanager-individuals-file.csv', None)
-
-    if alt:
-        plot_div = alt
-    else:
-        # Select all individuals for the given generation number.
-        fitness_vals = df[df["generation"].isin([generation])]["fitness"]
-        # fig = px.histogram(generation_df, x="fitness", show_hist=False, histnorm="probability density")
-        fig = ff.create_distplot([fitness_vals], [f"Generation {generation}"], show_rug=True, show_hist=False,
-                                 curve_type="normal")
-        fig.update_layout(title_text='Fitness Distribution')
-        plot_div = dcc.Graph(id=plot_id, figure=fig, responsive=True, className="h-full w-full",
+    fig = pp.plot_ec_population(df)
+    return dcc.Graph(id=plot_id, figure=fig, responsive=True, className="h-full w-full",
                              config=get_graph_config())
 
-    return plot_div
 
-
-def generation_network_graph(pathname: str, generation: tuple = (np.NINF, np.inf), plot_id: str = 'gen-network-plot'):
-    df, alt = read_file(pathname, 'tanager-individuals-file.csv', generation)
-
-    if alt:
-        plot_div = alt
-    else:
-        fig = gc.createNetworkGraph(df)
-        plot_div = dcc.Graph(id=plot_id, figure=fig, responsive=True, className="h-full w-full",
-                             config=get_graph_config())
-
-    return plot_div
-
-
-def plot_ec_population(pathname: str, generation: tuple = (np.NINF, np.inf), plot_id: str = 'ec-population-plot'):
-    df, alt = read_file(pathname, 'tanager-individuals-file.csv', generation)
-
-    if alt:
-        plot_div = alt
-    else:
-        fig = pp.plot_ec_population(df)
-        plot_div = dcc.Graph(id=plot_id, figure=fig, responsive=True, className="h-full w-full",
-                             config=get_graph_config())
-
-    return plot_div
-
-
-def plot_ec_stats(pathname: str, generation: tuple = (np.NINF, np.inf), plot_id: str = 'ec-population-plot'):
-    df, alt = read_file(pathname, 'tanager-statistics-file.csv', generation)
-
-    if alt:
-        plot_div = alt
-    else:
-        fig = pp.plot_ec_stats(df)
-        graph = dcc.Graph(id=plot_id,
-                          figure=fig,
-                          responsive=True,
-                          className="h-full w-full",
-                          config=get_graph_config())
-        plot_div = graph
-
-    return plot_div
+def plot_ec_stats(df: pd.DataFrame, generation: tuple = (np.NINF, np.inf), plot_id: str = 'ec-population-plot'):
+    filtered_df = tu.filter_generation(df, generation)
+    fig = pp.plot_ec_stats(filtered_df)
+    return dcc.Graph(id=plot_id,
+                      figure=fig,
+                      responsive=True,
+                      className="h-full w-full",
+                      config=get_graph_config())
 
 
 def plot_stats_table(pathname: str, num_rows: int = 10):

@@ -15,6 +15,7 @@ from dash.dependencies import Input, Output
 import tanager.components as tc
 import tanager.plots as tp
 import tanager.utils as tu
+import pandas as pd
 
 
 def get_projects(path: str):
@@ -37,7 +38,7 @@ def prepare_dash_server(projects):
         {'name': 'viewport',
          'content': 'width=device-width, initial-scale=1.0'
          }
-    ], external_stylesheets=external_stylesheets)
+    ], external_stylesheets=external_stylesheets, suppress_callback_exceptions=True)
 
     navbar = populate_nav_bar(projects)
 
@@ -109,6 +110,13 @@ if __name__ == '__main__':
             filtered_projects = [p for p in get_projects(tangager_data_folder) if value in p]
         return populate_nav_bar(filtered_projects)
 
+    # @app.callback(Output('gen-dist-plot', 'figure'),
+    #               Input('gen-dist-slider', 'value'),
+    #               Input('stats-json', 'children')
+    #               )
+    # def update_gen_dist_plot(value, json_data):
+    #     df = pd.read_json(json_data, orient='split')
+    #     return tp.generation_distribution(df)
 
     @app.callback(Output('page-content', 'children'),
                   [Input('url', 'pathname')])
@@ -118,6 +126,8 @@ if __name__ == '__main__':
             pathname = path.join(path.normpath(tangager_data_folder),
                                  project_name)
             generation = tu.num_generations(pathname)
+            # Load DataFrames for both stats and individuals file.
+            all_dfs = tu.load_data_files(pathname)
             slider_step = 1
             num_slider_marks = 20
             if generation > num_slider_marks:
@@ -126,8 +136,9 @@ if __name__ == '__main__':
             page_layout = html.Div(children=[
                 html.H1(f'Project {project_name}', className='text-gray-400 font-bold text-5xl my-10'),
                 html.Main(children=[
+                    html.Div(all_dfs['statistics'].to_json(date_format='iso', orient='split'), id='stats-json', style={'display': 'none'}),
                     tc.graph_panel(children=[
-                        tp.generation_distribution(pathname),
+                        dcc.Graph(id='gen-dist-plot', figure=tp.generation_distribution(all_dfs['individuals']), responsive=True, className="h-full w-full"),
                         html.Div('Select Generation', className='self-start'),
                         dcc.Slider(
                             id='gen-dist-slider',
@@ -140,16 +151,16 @@ if __name__ == '__main__':
                         )
                     ]),
                     tc.graph_panel(children=[
-                        tp.fitness_vs_generation(pathname),
+                        tp.fitness_vs_generation(all_dfs['statistics']),
                     ]),
                     tc.graph_panel(children=[
-                        tp.plot_ec_stats(pathname),
+                        tp.plot_ec_stats(all_dfs['statistics']),
                     ]),
                     tc.graph_panel(children=[
-                        tp.plot_ec_population(pathname),
+                        tp.plot_ec_population(all_dfs['individuals']),
                     ]),
                     tc.graph_panel(children=[
-                        tp.generation_network_graph(pathname)
+                        tp.generation_network_graph(all_dfs['individuals'])
                     ], className='2xl:col-span-2')
                 ], className='grid grid-cols-1 2xl:grid-cols-2 gap-6 mr-20'),
             ], className='w-full bg-gray-100 pl-20')
