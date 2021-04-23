@@ -87,6 +87,7 @@ def fitness_vs_generation(stats_df: pd.DataFrame, plot_id: str = 'fitness_vs_gen
     ])
     fig.update_layout(
         yaxis_title='Fitness',
+        xaxis_title='Generation',
         title='Average Fitness vs Generation',
         hovermode="x"
     )
