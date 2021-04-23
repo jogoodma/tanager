@@ -49,7 +49,7 @@ def navbar_item(*args, **kwargs):
 
 def graph_panel(*args, **kwargs):
     classname = kwargs.pop('className', '') + ' flex flex-col items-center px-5 py-6 shadow-lg rounded-xl bg-white'
-    return html.Section(*args, className=classname, **kwargs)
+    return html.Section(*args, className=classname, style={'min-height': '30rem'}, **kwargs)
 
 
 def get_default_page(config):

@@ -9,9 +9,9 @@ import pandas as pd
 import plotly.figure_factory as ff
 import plotly.graph_objects as go
 
+import tanager.utils as tu
 from . import networkgraph as gc
 from . import populationplots as pp
-import tanager.utils as tu
 
 
 def read_file(pathname, filename, generation_filter):
@@ -92,16 +92,17 @@ def fitness_vs_generation(stats_df: pd.DataFrame, plot_id: str = 'fitness_vs_gen
     )
 
     return dcc.Graph(id=plot_id, figure=fig, responsive=True, className="h-full w-full",
-                         config=get_graph_config())
+                     config=get_graph_config())
 
 
 def generation_distribution(stats_df: pd.DataFrame, generation: int = 0):
     # Select all individuals for the given generation number.
-    fitness_vals = stats_df[stats_df["generation"].isin([generation])]["fitness"]
+    fitness_vals = stats_df[stats_df["generation"] == generation]["fitness"]
     fig = ff.create_distplot([fitness_vals], [f"Generation {generation}"], show_rug=True, show_hist=False,
                              curve_type="normal")
     fig.update_layout(title_text='Fitness Distribution')
     return fig
+
 
 # def generation_distribution(pathname: str, generation: int = 0, plot_id: str = 'gen-dist-plot'):
 #     df, alt = read_file(pathname, 'tanager-individuals-file.csv', None)
@@ -121,11 +122,12 @@ def generation_distribution(stats_df: pd.DataFrame, generation: int = 0):
 #     return plot_div
 
 
-def generation_network_graph(df: pd.DataFrame, generation: tuple = (np.NINF, np.inf), plot_id: str = 'gen-network-plot'):
+def generation_network_graph(df: pd.DataFrame, generation: tuple = (np.NINF, np.inf),
+                             plot_id: str = 'gen-network-plot'):
     filtered_df = tu.filter_generation(df, generation)
     fig = gc.createNetworkGraph(filtered_df)
     return dcc.Graph(id=plot_id, figure=fig, responsive=True, className="h-full w-full",
-                             config=get_graph_config())
+                     config=get_graph_config())
 
 
 def plot_ec_population(df: pd.DataFrame, generation: tuple = (np.NINF, np.inf), plot_id: str = 'ec-population-plot'):
@@ -133,17 +135,17 @@ def plot_ec_population(df: pd.DataFrame, generation: tuple = (np.NINF, np.inf), 
 
     fig = pp.plot_ec_population(df)
     return dcc.Graph(id=plot_id, figure=fig, responsive=True, className="h-full w-full",
-                             config=get_graph_config())
+                     config=get_graph_config())
 
 
 def plot_ec_stats(df: pd.DataFrame, generation: tuple = (np.NINF, np.inf), plot_id: str = 'ec-population-plot'):
     filtered_df = tu.filter_generation(df, generation)
     fig = pp.plot_ec_stats(filtered_df)
     return dcc.Graph(id=plot_id,
-                      figure=fig,
-                      responsive=True,
-                      className="h-full w-full",
-                      config=get_graph_config())
+                     figure=fig,
+                     responsive=True,
+                     className="h-full w-full",
+                     config=get_graph_config())
 
 
 def plot_stats_table(pathname: str, num_rows: int = 10):

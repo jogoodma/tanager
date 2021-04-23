@@ -66,7 +66,7 @@ def populate_nav_bar(projects):
 # Global Area
 tanager_config = None
 tangager_data_folder = None
-tanager_debug_flag = True
+tanager_debug_flag = False
 
 
 def get_tanager_config():
@@ -110,13 +110,13 @@ if __name__ == '__main__':
             filtered_projects = [p for p in get_projects(tangager_data_folder) if value in p]
         return populate_nav_bar(filtered_projects)
 
-    # @app.callback(Output('gen-dist-plot', 'figure'),
-    #               Input('gen-dist-slider', 'value'),
-    #               Input('stats-json', 'children')
-    #               )
-    # def update_gen_dist_plot(value, json_data):
-    #     df = pd.read_json(json_data, orient='split')
-    #     return tp.generation_distribution(df)
+    @app.callback(Output('gen-dist-plot', 'figure'),
+                  Input('gen-dist-slider', 'value'),
+                  Input('individuals-json', 'children')
+                 )
+    def update_gen_dist_plot(value, json_data):
+        df = pd.read_json(json_data, orient='split')
+        return tp.generation_distribution(df, value)
 
     @app.callback(Output('page-content', 'children'),
                   [Input('url', 'pathname')])
@@ -137,6 +137,7 @@ if __name__ == '__main__':
                 html.H1(f'Project {project_name}', className='text-gray-400 font-bold text-5xl my-10'),
                 html.Main(children=[
                     html.Div(all_dfs['statistics'].to_json(date_format='iso', orient='split'), id='stats-json', style={'display': 'none'}),
+                    html.Div(all_dfs['individuals'].to_json(date_format='iso', orient='split'), id='individuals-json', style={'display': 'none'}),
                     tc.graph_panel(children=[
                         dcc.Graph(id='gen-dist-plot', figure=tp.generation_distribution(all_dfs['individuals']), responsive=True, className="h-full w-full"),
                         html.Div('Select Generation', className='self-start'),

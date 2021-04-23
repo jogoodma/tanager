@@ -1,7 +1,8 @@
 import glob
 import os.path as path
-import pandas as pd
+
 import numpy as np
+import pandas as pd
 
 
 def num_generations(pathname: str = None):
@@ -40,6 +41,3 @@ def filter_generation(df: pd.DataFrame, generation_filter: tuple = (np.NINF, np.
     if generation_filter:
         return df[df.generation.between(generation_filter[0], generation_filter[1])]
     return df
-
-
-
